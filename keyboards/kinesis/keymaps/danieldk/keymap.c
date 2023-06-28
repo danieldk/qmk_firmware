@@ -10,15 +10,14 @@ enum layer_names {
 };
 
 // Home row mods
-uint16_t const _T_SFT = SFT_T(KC_T);  // Shift on indexes
+uint16_t const _T_SFT = SFT_T(KC_T); // Shift on indexes
 uint16_t const _N_SFT = SFT_T(KC_N);
-uint16_t const _S_CMD = CMD_T(KC_S);  // Command on middle
+uint16_t const _S_CMD = CMD_T(KC_S); // Command on middle
 uint16_t const _E_CMD = CMD_T(KC_E);
-uint16_t const _D_CTL = CTL_T(KC_D);  // Control on index down
+uint16_t const _D_CTL = CTL_T(KC_D); // Control on index down
 uint16_t const _H_CTL = CTL_T(KC_H);
-uint16_t const _R_OPT = OPT_T(KC_R);  // Option on ring
+uint16_t const _R_OPT = OPT_T(KC_R); // Option on ring
 uint16_t const _I_OPT = OPT_T(KC_I);
-
 
 // MacOS shortcuts
 uint16_t const _1PASS = LGUI(KC_BSLS);        // 1Password
@@ -29,6 +28,8 @@ uint16_t const _SCRNS = LGUI(LSFT(KC_4));     // Screenshot
 uint16_t const _EMOJI = LCTL(LGUI(KC_SPACE)); // Emoji picker
 uint16_t const _NEXTS = LCTL(KC_RIGHT);       // Next screen
 uint16_t const _PREVS = LCTL(KC_LEFT);        // Previous screen
+
+// clang-format off
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_HOME] = LAYOUT(
@@ -121,11 +122,43 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+// clang-format on
+
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
-    if (!process_achordion(keycode, record)) { return false; }
+    if (!process_achordion(keycode, record)) {
+        return false;
+    }
     return true;
 }
 
 void matrix_scan_user(void) {
     achordion_task();
+}
+
+enum {
+    HAND_LEFT,
+    HAND_RIGHT,
+    HAND_THUMB,
+};
+
+#ifdef KEYBOARD_kinesis
+static uint8_t kinesis_on_hand(keypos_t pos) {
+    if (pos.row > 0x1 && pos.row < 0xa && pos.col > 4 && pos.col < 7)
+        return HAND_THUMB;
+    else if (pos.row < 6)
+        return HAND_LEFT;
+    return HAND_RIGHT;
+}
+#else
+#    error "on_hand is only defined for Kinesis keyboards"
+#endif
+
+bool kinesis_opposite_hands(const keyrecord_t* tap_hold_record, const keyrecord_t* other_record) {
+    return kinesis_on_hand(tap_hold_record->event.key) != kinesis_on_hand(other_record->event.key);
+}
+
+// By default, use the BILATERAL_COMBINATIONS rule to consider the tap-hold key
+// "held" only when it and the other key are on opposite hands.
+bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record, uint16_t other_keycode, keyrecord_t* other_record) {
+    return kinesis_opposite_hands(tap_hold_record, other_record);
 }

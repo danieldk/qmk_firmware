@@ -162,3 +162,9 @@ bool kinesis_opposite_hands(const keyrecord_t* tap_hold_record, const keyrecord_
 bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record, uint16_t other_keycode, keyrecord_t* other_record) {
     return kinesis_opposite_hands(tap_hold_record, other_record);
 }
+
+bool achordion_eager_mod(uint8_t mod) {
+    // Disable eager mods for the time being to find out if they
+    // are the source for occasional hangs.
+    return false;
+}

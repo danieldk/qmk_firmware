@@ -735,3 +735,32 @@ void keyboard_task(void) {
 
     led_task();
 }
+
+#ifdef ACHORDION_ENABLE
+
+typedef enum voyager_hand {
+    VOYAGER_LEFT,
+    VOYAGER_LEFT_THUMB,
+    VOYAGER_RIGHT,
+    VOYAGER_RIGHT_THUMB,
+
+} voyager_hand;
+
+voyager_hand voyager_key_hand(keypos_t pos) {
+    if (pos.row < 0x05) {
+        return VOYAGER_LEFT;
+    } else if (pos.row == 0x05) {
+        return VOYAGER_LEFT_THUMB;
+    } else if (pos.row < 0x0b) {
+        return VOYAGER_RIGHT;
+    } else { // pos.row == 0x0b
+        return VOYAGER_RIGHT_THUMB;
+    }
+}
+
+__attribute__((weak)) bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record, uint16_t other_keycode, keyrecord_t* other_record) {
+    // Override achordion logic to consider combinations of a thumb key any
+    // non-thumb key to be a chord as well.
+    return voyager_key_hand(tap_hold_record->event.key) != voyager_key_hand(other_record->event.key);
+}
+#endif

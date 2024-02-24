@@ -2,6 +2,8 @@
 #include "version.h"
 #define MOON_LED_LEVEL LED_LEVEL
 
+#include "config.h"
+
 enum custom_keycodes {
     RGB_SLD = ML_SAFE_RANGE,
     HSV_0_255_255,
@@ -201,3 +203,7 @@ void dance_0_reset(tap_dance_state_t *state, void *user_data) {
 tap_dance_action_t tap_dance_actions[] = {
     [DANCE_0] = ACTION_TAP_DANCE_FN_ADVANCED(on_dance_0, dance_0_finished, dance_0_reset),
 };
+
+uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
+    return TYPING_STREAK_TERM;
+}

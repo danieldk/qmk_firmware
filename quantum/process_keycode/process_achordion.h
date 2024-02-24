@@ -53,6 +53,27 @@
 
 #include "quantum.h"
 
+/**
+ * Suppress tap-hold mods within a *typing streak* by defining
+ * ACHORDION_STREAK. This can help preventing accidental mod
+ * activation when performing a fast tapping sequence.
+ * This is inspired by https://sunaku.github.io/home-row-mods.html#typing-streaks
+ *
+ * Enable with:
+ *
+ *    #define ACHORDION_STREAK
+ *
+ * Adjust the maximum time between key events before modifiers can be enabled
+ * by defining the following callback in your keymap.c:
+ *
+ *    uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
+ *      return 100;  // Default of 100 ms.
+ *    }
+ */
+#ifdef ACHORDION_STREAK
+uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode);
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -105,7 +126,8 @@ void achordion_task(void);
  * @param other_record keyrecord_t from the other key's press event.
  * @return True if the tap-hold key should be considered held.
  */
-bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record, uint16_t other_keycode, keyrecord_t* other_record);
+bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record,
+                     uint16_t other_keycode, keyrecord_t* other_record);
 
 /**
  * Optional callback to define a timeout duration per keycode.
@@ -155,7 +177,8 @@ bool achordion_eager_mod(uint8_t mod);
  * @param other_record keyrecord_t from the other key's event.
  * @return True if the keys are on opposite hands.
  */
-bool achordion_opposite_hands(const keyrecord_t* tap_hold_record, const keyrecord_t* other_record);
+bool achordion_opposite_hands(const keyrecord_t* tap_hold_record,
+                              const keyrecord_t* other_record);
 
 #ifdef __cplusplus
 }

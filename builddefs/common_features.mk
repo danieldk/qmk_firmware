@@ -956,4 +956,8 @@ endif
 ifeq ($(strip $(ACHORDION_ENABLE)), yes)
     OPT_DEFS += -DACHORDION_ENABLE -DPERMISSIVE_HOLD
     SRC += $(QUANTUM_DIR)/process_keycode/process_achordion.c
+
+    ifeq ($(strip $(ACHORDION_STREAK)), yes)
+        OPT_DEFS += -DACHORDION_STREAK
+    endif
 endif
